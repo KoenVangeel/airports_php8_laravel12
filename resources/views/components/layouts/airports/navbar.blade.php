@@ -33,7 +33,7 @@
             <flux:separator variant="subtle"/>
             <flux:navlist.item href="{{ route('admin.airports') }}">Airports</flux:navlist.item>
             <flux:navlist.item href="{{ route('admin.carriers') }}">Carriers</flux:navlist.item>
-            <flux:navlist.item href="#">Flights</flux:navlist.item>
+            <flux:navlist.item href="{{ route('admin.flights') }}">Flights</flux:navlist.item>
             <flux:navlist.item href="#">Passengers</flux:navlist.item>
         </flux:navlist.group>
     @endif

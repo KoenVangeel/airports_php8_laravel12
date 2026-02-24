@@ -60,14 +60,16 @@
                 </td>
                 <td>{{ $seatclass->bookings_count }}</td>
                 <td>
-                    <flux:button
-                        wire:click="editSeatclass({{ $seatclass->id }})"
-                        tooltip="Edit {{ $seatclass->name }}"
-                        icon="pencil-square"/>
-                    <flux:button
-                        wire:click="deleteConfirm({{ $seatclass->id }})"
-                        tooltip="Delete {{ $seatclass->name }}"
-                        icon="trash"/>
+                    <flux:button.group>
+                        <flux:button
+                            wire:click="editSeatclass({{ $seatclass->id }})"
+                            tooltip="Edit {{ $seatclass->name }}"
+                            icon="pencil-square"/>
+                        <flux:button
+                            wire:click="deleteConfirm({{ $seatclass->id }})"
+                            tooltip="Delete {{ $seatclass->name }}"
+                            icon="trash"/>
+                    </flux:button.group>
                 </td>
             </tr>
         @endforeach

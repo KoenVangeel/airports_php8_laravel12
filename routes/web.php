@@ -5,6 +5,7 @@ use App\Http\Middleware\Admin;
 use App\Livewire\Admin\Airports;
 use App\Livewire\Admin\Airportstatuses;
 use App\Livewire\Admin\Carriers;
+use App\Livewire\Admin\Flights;
 use App\Livewire\Admin\Flightstatuses;
 use App\Livewire\Admin\Seatclasses;
 use App\Livewire\Arrivals;
@@ -42,17 +43,11 @@ Route::middleware(['auth', ActiveUser::class, Admin::class])->prefix('admin')->g
     Route::get('flightstatuses', Flightstatuses::class)->name('admin.flightstatuses');
     Route::get('carriers', Carriers::class)->name('admin.carriers');
     Route::get('airports', Airports::class)->name('admin.airports');
+    Route::get('flights', Flights::class)->name('admin.flights');
 });
 
 /*
 Route::middleware(['auth', Admin::class, ActiveUser::class])->prefix('admin')->name('admin.')->group(function () {
-    Route::redirect('/', '/admin/seatclasses');
-    Route::get('airportstatuses', Airportstatuses::class)->name('airportstatuses');
-    Route::get('seatclasses', Seatclasses::class)->name('seatclasses');
-    Route::get('flightstatuses', Flightstatuses::class)->name('flightstatuses');
-    Route::get('carriers', Carriers::class)->name('carriers');
-    Route::get('airports', Airports::class)->name('airports');
-    Route::get('flights', Flights::class)->name('flights');
     Route::get('passengers', Passengers::class)->name('passengers');
 });
 */

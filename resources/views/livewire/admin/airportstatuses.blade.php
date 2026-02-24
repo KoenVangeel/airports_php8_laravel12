@@ -72,16 +72,18 @@
                 </td>
                 <td>{{ $airportstatus->airports_count }}</td>
                 <td>
+                    <flux:button.group>
                     {{-- Call editAirportstatus with the ID of the airportstatus --}}
                     {{-- klaar zetten van veldjes om door gebruiker aan te passen --}}
-                    <flux:button
-                        wire:click="editAirportstatus({{ $airportstatus->id }})"
-                        tooltip="Edit {{ $airportstatus->name }}"
-                        icon="pencil-square"/>
-                    <flux:button
-                        wire:click="deleteConfirm({{ $airportstatus->id }})"
-                        tooltip="Delete {{ $airportstatus->name }}"
-                        icon="trash"/>
+                        <flux:button
+                            wire:click="editAirportstatus({{ $airportstatus->id }})"
+                            tooltip="Edit {{ $airportstatus->name }}"
+                            icon="pencil-square"/>
+                        <flux:button
+                            wire:click="deleteConfirm({{ $airportstatus->id }})"
+                            tooltip="Delete {{ $airportstatus->name }}"
+                            icon="trash"/>
+                    </flux:button.group>
                 </td>
             </tr>
         @endforeach

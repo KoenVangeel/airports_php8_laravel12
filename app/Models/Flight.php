@@ -13,6 +13,11 @@ class Flight extends Model
 {
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
+    // anders werkt de checkbox niet als je een update doet en in het model komt
+    protected $casts = [
+        'boarding' => 'boolean',
+    ];
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
