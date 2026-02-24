@@ -35,9 +35,10 @@ class Arrivals extends Component
     {
         $this->selectedAirport = $airport;
 
+        $city = urlencode($this->selectedAirport->city);
         $weatherUrl = 'http://api.openweathermap.org/data/2.5/weather?q=' .
-            $this->selectedAirport->city .
-            '&units=metric&appid=563bd02c8e48c9cec4a6a9a0acd8e896';
+            $city .
+            '&units=metric&appid=' . env('OPENWEATHER_KEY');
 
         try {
             $response = Http::timeout(10)->get($weatherUrl)->json();
