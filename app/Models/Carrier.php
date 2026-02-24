@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,4 +34,27 @@ class Carrier extends Model
     }
 
     protected $appends = ['image'];
+
+    public function scopeSearchNameOrCode($query, $search = '%') : Builder
+        // use as Carriers::searchNameOrCode(...
+        // Run Laravel > Generate Helper Code again VOOR HELP IN PHPStorm
+    {
+        return $query->where('name', 'like', "%{$search}%")
+            ->orWhere('code', 'like', "%{$search}%");
+    }
+
+    public function scopeLogoExists($query, $exists = true)
+    {
+        // Get all airline ids that have logos based on file existence
+        $ids_with_logo = $query->pluck('id')->filter(function ($id) {
+            return Storage::disk('public')->exists('logos/' . $id . '.png');
+        })->values()->all();
+
+        // If $exists is true, we want airlines WITH logo (where id is in $ids_with_logo)
+        // If $exists is false, we want airlines WITHOUT logo (where mid is NOT in $ids_with_logo)
+        $method = $exists ? 'whereIn' : 'whereNotIn';
+
+        return $query->$method('id', $ids_with_logo);
+    }
+
 }

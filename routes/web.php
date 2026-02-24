@@ -4,6 +4,7 @@ use App\Http\Middleware\ActiveUser;
 use App\Http\Middleware\Admin;
 use App\Livewire\Admin\Airports;
 use App\Livewire\Admin\Airportstatuses;
+use App\Livewire\Admin\Carriers;
 use App\Livewire\Admin\Flightstatuses;
 use App\Livewire\Admin\Seatclasses;
 use App\Livewire\Arrivals;
@@ -39,7 +40,7 @@ Route::middleware(['auth', ActiveUser::class, Admin::class])->prefix('admin')->g
     Route::get('airportstatuses', Airportstatuses::class)->name('admin.airportstatuses');
     Route::get('seatclasses', Seatclasses::class)->name('admin.seatclasses');
     Route::get('flightstatuses', Flightstatuses::class)->name('admin.flightstatuses');
-
+    Route::get('carriers', Carriers::class)->name('admin.carriers');
     Route::get('airports', Airports::class)->name('admin.airports');
 });
 

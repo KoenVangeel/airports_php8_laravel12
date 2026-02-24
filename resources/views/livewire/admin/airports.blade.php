@@ -40,7 +40,7 @@
                 <th>
                     <flux:select wire:model.live="perPage" label="">
                         @foreach ([5,10,15,20] as $value)
-                            <flux:select.option value="{{ $value }}">{{ $value }} Records</flux:select.option>
+                            <flux:select.option value="{{ $value }}">{{ $value }} airports</flux:select.option>
                         @endforeach
                     </flux:select>
                 </th>
