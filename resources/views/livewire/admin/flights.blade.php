@@ -195,7 +195,7 @@
                     <flux:button variant="ghost" wire:click="resetValues()">Cancel</flux:button>
                 </flux:modal.close>
                 <flux:button
-                    wire:click="saveUpdatedSchedule({{ $form->id }})"
+                    wire:click="saveUpdatedSchedule()"
                     variant="primary">Update Schedule
                 </flux:button>
             </div>

@@ -20,6 +20,12 @@ use App\Livewire\Settings\TwoFactor;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
+/* alleen om op combell de symlink aan te maken
+Route::get('/symlink', function () {
+    Artisan::call('storage:link');
+});
+*/
+
 Route::view('playground', 'playground')->name('playground');
 
 Route::view('/', 'home')->name('home');

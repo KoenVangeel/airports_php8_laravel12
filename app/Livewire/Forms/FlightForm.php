@@ -81,7 +81,9 @@ class FlightForm extends Form
     }
 
     // Only update the ETA and ETD
-    public function updateFlightSchedule(Flight $flight) {
+    public function updateFlightSchedule() {
+        $flight = Flight::findOrFail($this->id);
+        $this->validate();
         $flight->update([
             'etd' => Carbon::parse($this->etd)->format('Y-m-d H:i:s'),
             'eta' => Carbon::parse($this->eta)->format('Y-m-d H:i:s'),

@@ -16,7 +16,7 @@ class Carrier extends Model
     {
         return $this->hasMany(Flight::class);
     }
-
+    /* Storage::disk('public')->exists($imagePath); WERKT NIET OP COMBELL
     protected function image(): Attribute
     {
         return Attribute::make(
@@ -30,6 +30,18 @@ class Carrier extends Model
                 // Return the URL for the default 'no-cover' image
                 return Storage::disk('public')->url('logos/no-logo.png');
             }
+        );
+    }
+    */
+    protected function image(): Attribute
+    {
+        return Attribute::make(
+            get: fn () =>
+            asset(
+                file_exists(storage_path('app/public/logos/' . $this->id . '.png'))
+                    ? 'storage/logos/' . $this->id . '.png'
+                    : 'storage/logos/no-logo.png'
+            )
         );
     }
 

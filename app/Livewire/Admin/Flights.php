@@ -3,11 +3,14 @@
 namespace App\Livewire\Admin;
 
 use App\Livewire\Forms\FlightForm;
+use App\Mail\FlightScheduleMail;
 use App\Models\Airport;
+use App\Models\Booking;
 use App\Models\Carrier;
 use App\Models\Flight;
 use App\Models\Flightstatus;
 use App\Traits\NotificationsTrait;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -33,6 +36,7 @@ class Flights extends Component
 
     public $showModal = false;
     public $showModalUpdateSchedule = false;
+    public $carriername;
 
     public FlightForm $form;
 
@@ -78,6 +82,15 @@ class Flights extends Component
         $this->showModal = true;
     }
 
+    // open the model for editing the flight schedule
+    public function editFlightSchedule(Flight $flight)
+    {
+        $this->resetValues();
+        $this->form->fill($flight);
+        $this->carriername = $flight->carrier->name;
+        $this->showModalUpdateSchedule = true;
+    }
+
     public function updateFlight()
     {
         $this->form->update();
@@ -87,6 +100,43 @@ class Flights extends Component
                 'position' => 'bottom-right'
             ]);
         $this->resetValues();
+    }
+
+    // write the new flight schedule to the database and send the mails
+    public function saveUpdatedSchedule()
+    {
+        $this->form->updateFlightSchedule();
+        $this->showModalUpdateSchedule = false;
+
+        $flight = Flight::findOrFail($this->form->id);
+        $this->sendConfirmationMails($flight);
+
+        $this->toastInfo("<p>The flight schedule for flightnumber <b><i>{$this->form->number}</i></b> has been updated.</p>" .
+            "<p><br /></p><p>An e-mail to inform all passengers has been sent!</p>",
+            [
+                'position' => 'bottom-right'
+            ]);
+        $this->resetValues();
+    }
+
+    private function sendConfirmationMails(Flight $flight)
+    {
+        // mail created with php artisan make:mail FlightScheduleMail --markdown=emails.flightschedule
+        // check mail at http://localhost:8025/
+        // only 3 bookings to test !
+
+        $bookings = Booking::select('id', 'passenger_id')
+            ->with('passenger')
+            ->where('flight_id', '=', $flight->id)
+            ->limit(3)
+            ->get();
+
+        foreach($bookings as $booking) {
+            $to = [['email' => $booking->passenger->email,
+                'name' => $booking->passenger->firstname . ' ' . $booking->passenger->lastname]];
+            Mail::to($to)
+                ->send(new FlightScheduleMail($booking->passenger->firstname, $booking->passenger->lastname, $flight->carrier->name, $flight->number, $flight->fullDepartureTime, $flight->fullArrivalTime));
+        }
     }
 
     public function deleteConfirm(Flight $flight)
