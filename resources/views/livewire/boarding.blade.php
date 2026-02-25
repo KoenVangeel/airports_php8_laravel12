@@ -1,153 +1,242 @@
 <div>
     <x-slot:title>Currently Boarding at all Airports</x-slot:title>
 
-    {{-- Pagination --}}
-    <div class="my-4">{{ $flights->links() }}</div>
+    <div class="container mx-auto">
+        <div class="my-6">
+            {{ $flights->links() }}
+        </div>
 
-    {{-- Grid of flight cards --}}
-    <div class="container mx-auto mt-8">
-        <div class="bg-white dark:bg-zinc-700 border border-zinc-300 dark:border-zinc-800 rounded-lg shadow hover:shadow-lg transition-shadow duration-200">
-            {{-- Header: Titel + perPage selector --}}
-            <div class="p-5 border-b border-zinc-200 dark:border-zinc-600 flex items-center justify-between">
-                <p class="text-base font-semibold text-zinc-900 dark:text-zinc-100">Currently Boarding</p>
-
-                <flux:select wire:model.live="perPage" label="" class="w-36">
-                    @foreach ([10,20,30,40] as $value)
-                        <flux:select.option value="{{ $value }}">{{ $value }} Records</flux:select.option>
-                    @endforeach
-                </flux:select>
+        <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-700">
+                        <tr>
+                            <th class="px-6 py-6 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Flight</th>
+                            <th class="px-6 py-6 text-xs font-semibold text-zinc-500 uppercase tracking-wider text-center">Departure</th>
+                            <th class="px-6 py-6 text-xs font-semibold text-zinc-500 uppercase tracking-wider text-center">Route</th>
+                            <th class="px-6 py-6 text-xs font-semibold text-zinc-500 uppercase tracking-wider text-center">Arrival</th>
+                            <th class="px-6 py-6 text-xs font-semibold text-zinc-500 uppercase tracking-wider text-center">Passengers</th>
+                            <th class="px-6 py-0 text-xs font-semibold text-zinc-500 uppercase tracking-wider text-right">
+                                <flux:select wire:model.live="perPage" label="" size="sm" class="w-32 ml-auto">
+                                    @foreach ([10,20,30,40] as $value)
+                                        <flux:select.option value="{{ $value }}">{{ $value }} Flights</flux:select.option>
+                                    @endforeach
+                                </flux:select>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                        @forelse($flights as $flight)
+                            <tr wire:key="{{ $flight->id }}" class="hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="h-10 w-10 flex-shrink-0 bg-white p-1 rounded border border-zinc-200 dark:border-zinc-600">
+                                            <img src="{{ $flight->carrier->image }}" alt="{{ $flight->carrier->name }}" class="h-full w-full object-contain">
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold text-zinc-900 dark:text-white">{{ $flight->number }}</div>
+                                            <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $flight->carrier->name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="text-sm font-semibold text-zinc-900 dark:text-white">{{ $flight->short_departure_time }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $flight->full_departure_date }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <div class="text-center">
+                                            <div class="text-sm font-medium text-zinc-900 dark:text-white">{{ $flight->from_airport->code }}</div>
+                                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase">{{ $flight->from_airport->city }}</div>
+                                        </div>
+                                        <div class="flex flex-col items-center">
+                                            <flux:icon name="arrow-right" variant="micro" class="text-zinc-400" />
+                                            <div class="h-px w-8 bg-zinc-200 dark:bg-zinc-600 my-1"></div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-sm font-medium text-zinc-900 dark:text-white">{{ $flight->to_airport->code }}</div>
+                                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase">{{ $flight->to_airport->city }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="text-sm font-semibold text-zinc-900 dark:text-white">{{ $flight->short_arrival_time }}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $flight->full_arrival_date }}</div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <flux:badge size="sm" color="zinc" class="font-mono">
+                                        {{ $flight->bookings_count }}
+                                    </flux:badge>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <flux:button
+                                        wire:click="startBoarding({{ $flight->id }})"
+                                        variant="primary"
+                                        size="sm"
+                                        icon="paper-airplane"
+                                    >
+                                        Boarding
+                                    </flux:button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-12 text-center">
+                                    <flux:icon name="no-symbol" class="mx-auto h-12 w-12 text-zinc-300 dark:text-zinc-600 mb-4" />
+                                    <div class="text-zinc-500 dark:text-zinc-400 font-medium">No flights currently boarding</div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            {{-- Flights list --}}
-            <ul class="p-2 space-y-2">
-                @forelse($flights as $flight)
-                    <li class="flex flex-col text-xs md:flex-row md:justify-between md:items-center bg-zinc-50 dark:bg-zinc-600 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-500 transition-colors">
-                        {{-- Flight details --}}
-                        <div class="flex flex-col md:flex-row">
-                        <span class="font-normal text-zinc-800 dark:text-zinc-100 left-5 pl-3">
-                            {{ $flight->full_departure_time }} → {{ $flight->full_arrival_time }}
-                        </span>
-                            <span class="text-zinc-700 dark:text-zinc-300 md:ml-2">
-                            {{ $flight->from_airport->city }} → {{ $flight->to_airport->city }}
-                            ({{ $flight->carrier->name }} flight <b>{{ $flight->number }}</b>, {{ $flight->bookings_count }} passengers)
-                        </span>
-                        </div>
-
-                        {{-- Knop rechts --}}
-                        <div class="mt-2 md:mt-0">
-                            <flux:button
-                                wire:click="startBoarding({{ $flight->id }})"
-                                icon="paper-airplane"
-                                tooltip="Start boarding"
-                                variant="subtle"
-                                class="cursor-pointer border-zinc-200 dark:border-zinc-700 rounded-md"
-                            />
-                        </div>
-                    </li>
-                @empty
-                    <li class="bg-zinc-50 dark:bg-zinc-600 rounded-lg p-4 text-center text-gray-500 dark:text-gray-400 italic font-semibold">
-                        No flights currently boarding
-                    </li>
-                @endforelse
-            </ul>
-
+        <div class="my-6">
+            {{ $flights->links() }}
         </div>
     </div>
 
-    {{-- Pagination bottom --}}
-    <div class="my-4">{{ $flights->links() }}</div>
-
     {{-- Detail section --}}
-    <flux:modal name="boardingModal" class="w-full max-w-6xl">
+    <flux:modal name="boardingModal" class="w-full max-w-6xl" :closable="false">
         @isset($selectedFlight->number)
-        <div class="flex flex-row gap-4 mt-4">
-            <div class="flex-1 flex-col gap-2">
-                <div class="grid grid-cols-3 gap-5">
-                    <div>
-                        <div class="bg-white text-gray-900 p-2 rounded-lg shadow-lg">
-                            <div class="flex bg-yellow-400 col-span-2 text-xl font-bold text-center mb-2 p-5">
+        <div class="space-y-6 mt-4">
+            {{-- Boarding Header / "Ticket" Style --}}
+            <div class="bg-zinc-900 text-white rounded-xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+                {{-- Left: Gate & Info --}}
+                <div class="bg-yellow-400 text-black p-8 flex flex-col items-center justify-center md:w-1/4">
+                    <flux:icon name="ticket" variant="outline" class="w-12 h-12 mb-2" />
+                    <div class="text-xs font-black uppercase tracking-widest opacity-60">Departure Gate</div>
+                    <div class="text-6xl font-black">{{ $selectedFlight->gate }}</div>
+                </div>
 
-                                <flux:icon name="plane-takeoff" class="w-12 h-12 text-black" />
-                                <h3 class="text-4xl font-bold ml-5 mb-4 mt-2"> GATE {{ $selectedFlight->gate }}</h3>
+                {{-- Right: Flight Details --}}
+                <div class="p-8 flex-1 relative overflow-hidden">
+                    {{-- Decorative pattern --}}
+                    <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+                         <flux:icon name="globe-americas" class="w-64 h-64 -mr-20 -mt-20" />
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-6 relative z-10">
+                        <div class="flex items-center gap-6">
+                            <div class="h-16 w-16 bg-white p-2 rounded-lg flex-shrink-0">
+                                <img src="{{ $selectedFlight->carrier->image }}" alt="Logo" class="h-full w-full object-contain">
                             </div>
-                            <div class="flex bg-white mt-3 items-center">
-                                <img class="w-1/3"
-                                     src="{{ $selectedFlight->carrier->image }}?{{ rand() }}" alt="Logo">
-                                <div class="text-2xl ml-5">{{ $selectedFlight->carrier->name }}</div>
+                            <div>
+                                <div class="text-2xl font-black tracking-tight">{{ $selectedFlight->carrier->name }}</div>
+                                <div class="text-yellow-400 font-mono font-bold">{{ $selectedFlight->number }}</div>
                             </div>
-                            <div class="bg-black text-white p-3 mt-3">
-                                <h3 class="text-3xl">{{ $selectedFlight->to_airport->city }}</h3>
+                        </div>
+
+                        <div class="flex items-center gap-8">
+                            <div class="text-center">
+                                <div class="text-3xl font-black uppercase">{{ $selectedFlight->from_airport->code }}</div>
+                                <div class="text-[10px] opacity-60 uppercase">{{ $selectedFlight->from_airport->city }}</div>
+                                <div class="text-sm font-bold mt-1">{{ $selectedFlight->short_departure_time }}</div>
                             </div>
-                            <div class="bg-black text-white flex justify-between p-3">
-                                <h4 class="text-2xl">{{ $selectedFlight->short_departure_time }}</h4>
-                                <h3 class="text-2xl">{{ $selectedFlight->number }}</h3>
+                            <div class="flex flex-col items-center gap-1">
+                                <flux:icon name="chevron-right" class="text-yellow-400" />
+                                <div class="w-12 h-px bg-zinc-700"></div>
                             </div>
-                            <div class="bg-black text-green-300 flex justify-between p-3">
-                                <h4 class="text-2xl">Now boarding all passengers</h4>
+                            <div class="text-center">
+                                <div class="text-3xl font-black uppercase">{{ $selectedFlight->to_airport->code }}</div>
+                                <div class="text-[10px] opacity-60 uppercase">{{ $selectedFlight->to_airport->city }}</div>
+                                <div class="text-sm font-bold mt-1">{{ $selectedFlight->short_arrival_time }}</div>
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <!-- Passengers waiting for boarding -->
-                        <h2 class="text-lg font-semibold mb-2">Waiting for Boarding</h2>
-                        <x-itf.table class="w-full">
-                            <thead>
+
+                    <div class="mt-8 flex items-center gap-2 text-green-400">
+                        <span class="relative flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        </span>
+                        <span class="text-xs font-black uppercase tracking-widest">Now Boarding All Passengers</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {{-- Waiting List --}}
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between px-2">
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <flux:icon name="users" variant="mini" class="text-zinc-400" />
+                            Waiting for Boarding
+                        </h2>
+                        <flux:badge size="sm" color="yellow" variant="solid">{{ count($waiting) }}</flux:badge>
+                    </div>
+
+                    <div class="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-zinc-50 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-700">
                                 <tr>
-                                    <th>Seat</th>
-                                    <th>Passenger</th>
-                                    <th>Passport</th>
-                                    <th>Action</th>
+                                    <th class="px-4 py-3 font-semibold text-zinc-500">Seat</th>
+                                    <th class="px-4 py-3 font-semibold text-zinc-500">Passenger</th>
+                                    <th class="px-4 py-3 font-semibold text-zinc-500">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-700">
                                 @forelse($waiting as $booking)
-                                    <tr wire:key="waiting_{{ $booking->id }}">
-                                        <td>{{ $booking->seat }}</td>
-                                        <td>{{ $booking->passenger->firstname }} {{ $booking->passenger->lastname }}</td>
-                                        <td>{{ $booking->passenger->passport_number }}</td>
-                                        <td>
+                                    <tr wire:key="waiting_{{ $booking->id }}" class="hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors">
+                                        <td class="px-4 py-3 font-mono font-bold">{{ $booking->seat }}</td>
+                                        <td class="px-4 py-3">
+                                            <div class="font-medium text-zinc-900 dark:text-zinc-100">{{ $booking->passenger->firstname }} {{ $booking->passenger->lastname }}</div>
+                                            <div class="text-[10px] text-zinc-500">{{ $booking->passenger->passport_number }}</div>
+                                        </td>
+                                        <td class="px-4 py-3">
                                             <flux:button
                                                 wire:click="boardPassenger({{ $booking->id }})"
-                                                icon="paper-airplane"
-                                                tooltip="Board Passenger"
+                                                size="xs"
                                                 variant="subtle"
-                                                label="Board"
-                                            />
+                                                icon="arrow-right"
+                                            >Board</flux:button>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center p-4">All passengers are on board.</td>
+                                        <td colspan="3" class="px-4 py-8 text-center text-zinc-500 italic">No passengers waiting.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
-                        </x-itf.table>
+                        </table>
                     </div>
-                    <div>
-                        <!-- Passengers already in the plane -->
-                        <h2 class="text-lg font-semibold mb-2">On Board</h2>
-                        <x-itf.table>
-                            <thead>
+                </div>
+
+                {{-- On Board List --}}
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between px-2">
+                        <h2 class="text-lg font-bold flex items-center gap-2 text-zinc-400">
+                            <flux:icon name="check-circle" variant="mini" class="text-green-500" />
+                            Already On Board
+                        </h2>
+                        <flux:badge size="sm" color="green" variant="solid">{{ count($boarded) }}</flux:badge>
+                    </div>
+
+                    <div class="bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-zinc-100 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-700">
                                 <tr>
-                                    <th>Seat</th>
-                                    <th>Passenger</th>
-                                    <th>Passport</th>
+                                    <th class="px-4 py-3 font-semibold text-zinc-500">Seat</th>
+                                    <th class="px-4 py-3 font-semibold text-zinc-500">Passenger</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                                 @forelse($boarded as $booking)
-                                    <tr wire:key="boarded_{{ $booking->id }}">
-                                        <td>{{ $booking->seat }}</td>
-                                        <td>{{ $booking->passenger->firstname }} {{ $booking->passenger->lastname }}</td>
-                                        <td>{{ $booking->passenger->passport_number }}</td>
+                                    <tr wire:key="boarded_{{ $booking->id }}" class="text-zinc-500">
+                                        <td class="px-4 py-3 font-mono font-medium">{{ $booking->seat }}</td>
+                                        <td class="px-4 py-3">
+                                            <div class="font-medium">{{ $booking->passenger->firstname }} {{ $booking->passenger->lastname }}</div>
+                                            <div class="text-[10px] opacity-75">{{ $booking->passenger->passport_number }}</div>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="text-center p-4">No passengers on board yet.</td>
+                                        <td colspan="2" class="px-4 py-8 text-center text-zinc-400 italic">Cabin is empty.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
-                        </x-itf.table>
+                        </table>
                     </div>
                 </div>
             </div>

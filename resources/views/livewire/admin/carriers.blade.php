@@ -87,7 +87,7 @@
                         label="Code"/>
                     <flux:input
                         wire:model.live.debounce.500ms="form.name"
-                        label="City"/>
+                        label="Name"/>
                 </div>
             </div>
             <div class="flex gap-4">
